@@ -69,6 +69,18 @@ static void cmd_bol(const char *pf, char **args)
 	move_bol();
 }
 
+static void cmd_smarthome(const char *pf, char **args)
+{
+	if (! block_iter_bol(&view->cursor)) {
+		long top = view->vy + window_get_scroll_margin(window);
+		if (view->cy > top)
+			move_up(view->cy - top);
+		else
+			block_iter_bof(&view->cursor);
+	}
+	view_reset_preferred_x(view);
+}
+
 static void cmd_case(const char *pf, char **args)
 {
 	int mode = 't';
@@ -279,6 +291,18 @@ static void cmd_eof(const char *pf, char **args)
 static void cmd_eol(const char *pf, char **args)
 {
 	move_eol();
+}
+
+static void cmd_smartend(const char *pf, char **args)
+{
+	if (! block_iter_eol(&view->cursor)) {
+		long bottom = view->vy + window->edit_h - 1 - window_get_scroll_margin(window);
+		if (view->cy < bottom)
+			move_down(bottom - view->cy);
+		else
+			block_iter_eof(&view->cursor);
+	}
+	view_reset_preferred_x(view);
 }
 
 static void cmd_erase(const char *pf, char **args)
@@ -1494,6 +1518,7 @@ const struct command commands[] = {
 	{ "bind",		"",	1,  2, cmd_bind },
 	{ "bof",		"",	0,  0, cmd_bof },
 	{ "bol",		"",	0,  0, cmd_bol },
+	{ "smarthome",		"",	0,  0, cmd_smarthome },
 	{ "case",		"lu",	0,  0, cmd_case },
 	{ "cd",			"",	1,  1, cmd_cd },
 	{ "center-view",	"",	0,  0, cmd_center_view },
@@ -1509,6 +1534,7 @@ const struct command commands[] = {
 	{ "down",		"",	0,  0, cmd_down },
 	{ "eof",		"",	0,  0, cmd_eof },
 	{ "eol",		"",	0,  0, cmd_eol },
+	{ "smartend",		"",	0,  0, cmd_smartend },
 	{ "erase",		"",	0,  0, cmd_erase },
 	{ "erase-bol",		"",	0,  0, cmd_erase_bol },
 	{ "erase-word",		"s",	0,  0, cmd_erase_word },
